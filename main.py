@@ -23,5 +23,6 @@ def get_secrets():
 
     return secrets
 
-src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
-films = data_cleaning(src_data)
+if __name__ == '__main__':
+    src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
+    films = data_cleaning(src_data)
