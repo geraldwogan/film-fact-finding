@@ -1,9 +1,5 @@
 import pandas as pd
-
-# Connect to API
-# Read source data from excel file
-# Extract IMBD ID from data
-# Fetch target data from API, using ID'S
+import json
 
 def data_cleaning(all_media):
     # Extract 'Movie' data from source dataset.
@@ -18,6 +14,14 @@ def data_cleaning(all_media):
     print(tidy_films.head())
 
     return tidy_films
+
+def get_secrets():
+    # api token info
+    json_file = open("resources/secrets.json")
+    secrets = json.load(json_file)
+    json_file.close()
+
+    return secrets
 
 src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
 films = data_cleaning(src_data)
