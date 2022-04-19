@@ -24,17 +24,17 @@ def get_secrets():
 
     return secrets
 
-def test_connection(api_key):
+def test_connection(api_key,  imdb_id):
     needed_headers = {'User-Agent': "film-fact-finding/1.0"}
-    response = requests.get(f'https://api.themoviedb.org/3/movie/76341?api_key={api_key}', headers = needed_headers) # 76341 = Mad Max
+    response = requests.get(f'https://api.themoviedb.org/3/find/{imdb_id}?api_key={api_key}&external_source=imdb_id', headers = needed_headers)
     print(response.status_code)
     print(response.content)
 
     return response
 
 if __name__ == '__main__':
-    secrets = get_secrets()
-    test_connection(secrets['api_key'])
-
     src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
     films = data_cleaning(src_data)
+    test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
+    secrets = get_secrets()
+    test_connection(secrets['api_key'], test_id)
