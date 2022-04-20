@@ -41,6 +41,18 @@ def get_data_from_api(api_key, imdb_id):
 
     return first_result
 
+def get_info_from_film(film, master):
+    # Take info from retrieved movie and 
+    # append it to existing data  
+    film['Fan Rating'] = master['vote_average']
+    film['Popularity'] = master['popularity']
+    film['Release Date'] = master['release_date']
+    film['Genres'] = master['genre_ids']
+    film['Poster Image Source'] = 'https://image.tmdb.org/t/p/original' + master['poster_path']
+    film['Poster Image Local'] = 'album_covers/' + film['imdb_id']
+
+    return film
+
 
 if __name__ == '__main__':
     src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
@@ -48,12 +60,14 @@ if __name__ == '__main__':
     test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
     
     secrets = get_secrets()
-    film =  get_data_from_api(secrets['api_key'], test_id)
+    master =  get_data_from_api(secrets['api_key'], test_id)
+    print(get_info_from_film(films.iloc[0], master))
 
-    print(f'------GET movie ({test_id})-----')
-    print(film['original_title'])
-    print(f"popularity: {film['popularity']}")
-    print(f"rating: {film['vote_average']}")
-    print(f"genres: {film['genre_ids']}")
+
+    # print(f'------GET movie ({test_id})-----')
+    # print(master['original_title'])
+    # print(f"popularity: {master['popularity']}")
+    # print(f"rating: {master['vote_average']}")
+    # print(f"genres: {master['genre_ids']}")
 
 
