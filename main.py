@@ -32,7 +32,7 @@ def get_data_from_api(api_key, imdb_id):
     # find/{imdb_id} endpoint
     response = requests.get(f'https://api.themoviedb.org/3/find/{imdb_id}?api_key={api_key}&external_source=imdb_id', headers = needed_headers)
 
-    if response.status_code != '200':
+    if response.status_code != 200:
         sys.exit('Invalid API response {0}.'.format(response.status_code))
 
     # Get movie info from return content
@@ -49,4 +49,11 @@ if __name__ == '__main__':
     
     secrets = get_secrets()
     film =  get_data_from_api(secrets['api_key'], test_id)
-    print(film)
+
+    print(f'------GET movie ({test_id})-----')
+    print(film['original_title'])
+    print(f"popularity: {film['popularity']}")
+    print(f"rating: {film['vote_average']}")
+    print(f"genres: {film['genre_ids']}")
+
+
