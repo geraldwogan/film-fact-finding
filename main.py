@@ -35,7 +35,6 @@ def get_genres_from_api(api_key):
 
     if response.status_code != 200:
         sys.exit('Invalid API response {0}.'.format(response.status_code))
-    # print(response.text)
 
     # Get movie info from return content
     content = response.json()
@@ -90,9 +89,13 @@ if __name__ == '__main__':
     
     secrets = get_secrets()
     genres = get_genres_from_api(secrets['api_key'])
+    # Re-index genres 
+    genres = dict((item['id'], item) for item in genres)
     print(genres)
+
+    # Sample get from re-indexed genres dict
+    sample_genre = genres.get(28, {}).get('name')
+    print(sample_genre)
 
     # master =  get_data_from_api(secrets['api_key'], test_id)
     # print(get_info_from_film(films.iloc[0], master))
-
-
