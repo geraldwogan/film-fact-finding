@@ -26,6 +26,23 @@ def get_secrets():
 
     return secrets
 
+def get_genres_from_api(api_key):
+    # Headers -> User-Agent
+    needed_headers = {'User-Agent': "film-fact-finding/1.0"}
+
+    # find/{imdb_id} endpoint
+    response = requests.get(f'https://api.themoviedb.org/3/genre/movie/list?api_key={api_key}', headers = needed_headers)
+
+    if response.status_code != 200:
+        sys.exit('Invalid API response {0}.'.format(response.status_code))
+    # print(response.text)
+
+    # Get movie info from return content
+    content = response.json()
+    # print(content)
+
+    return content['genres']
+
 def get_data_from_api(api_key, imdb_id):
     # Headers -> User-Agent
     needed_headers = {'User-Agent': "film-fact-finding/1.0"}
@@ -67,12 +84,15 @@ def get_info_from_film(film, master):
 
 
 if __name__ == '__main__':
-    src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
-    films = data_cleaning(src_data)
-    test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
+    # src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
+    # films = data_cleaning(src_data)
+    # test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
     
     secrets = get_secrets()
-    master =  get_data_from_api(secrets['api_key'], test_id)
-    print(get_info_from_film(films.iloc[0], master))
+    genres = get_genres_from_api(secrets['api_key'])
+    print(genres)
+
+    # master =  get_data_from_api(secrets['api_key'], test_id)
+    # print(get_info_from_film(films.iloc[0], master))
 
 
