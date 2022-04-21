@@ -1,5 +1,6 @@
 import pandas as pd
 import json
+import re
 import requests
 import sys
 
@@ -38,8 +39,31 @@ def get_data_from_api(api_key, imdb_id):
     # Get movie info from return content
     content = response.json()
     first_result = content['movie_results'][0]
+    print(first_result)
 
     return first_result
+
+def get_info_from_film(film, master):
+    # Take info from retrieved movie and 
+    # append it to existing data  
+    film['Fan Rating'] = master['vote_average']
+    film['Popularity'] = master['popularity']
+    film['Release Date'] = master['release_date']
+    film['Genres'] = master['genre_ids']
+    film['Poster Image Source'] = f"https://image.tmdb.org/t/p/original{master['poster_path']}"
+    img_type = re.findall(r'[^.]+$', film['Poster Image Source'])[0] # Get file type of image (.jpeg, .png, etc.)
+    film['Poster Image Local'] = 'film_posters/' + film['imdb_id'] + '.' + img_type
+
+    try:
+        img_data = requests.get(film['Poster Image Source']).content
+        with open(film['Poster Image Local'], 'wb') as handler:
+            handler.write(img_data)
+
+    except Exception as e:
+        film['Poster Image Local'] = 'Download Failure'
+        sys.exit(f"Unable to download image {film['Poster Image Source']}, error {e}")
+
+    return film
 
 
 if __name__ == '__main__':
@@ -48,12 +72,7 @@ if __name__ == '__main__':
     test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
     
     secrets = get_secrets()
-    film =  get_data_from_api(secrets['api_key'], test_id)
-
-    print(f'------GET movie ({test_id})-----')
-    print(film['original_title'])
-    print(f"popularity: {film['popularity']}")
-    print(f"rating: {film['vote_average']}")
-    print(f"genres: {film['genre_ids']}")
+    master =  get_data_from_api(secrets['api_key'], test_id)
+    print(get_info_from_film(films.iloc[0], master))
 
 
