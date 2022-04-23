@@ -65,7 +65,10 @@ def get_info_from_film(film, master):
     film['Fan Rating'] = master['vote_average']
     film['Popularity'] = master['popularity']
     film['Release Date'] = master['release_date']
-    film['Genres'] = master['genre_ids']
+
+    film['Genre_IDs'] = master['genre_ids']
+    film['Genres'] = get_genre_from_ids(film)
+
     film['Poster Image Source'] = f"https://image.tmdb.org/t/p/original{master['poster_path']}"
     img_type = re.findall(r'[^.]+$', film['Poster Image Source'])[0] # Get file type of image (.jpeg, .png, etc.)
     film['Poster Image Local'] = 'film_posters/' + film['imdb_id'] + '.' + img_type
@@ -81,21 +84,29 @@ def get_info_from_film(film, master):
 
     return film
 
+def get_genre_from_ids(film): # TODO: Change to list comprehension?
+    # Initialize list
+    genre_names = []
+
+    # Get Name of Genre from ID for each ID
+    for id in film['Genre_IDs']:
+        genre_names.append(genres.get(id, {}).get('name'))
+    
+    # Return list of Genres e.g. [Action, Adventure, Science Fiction]
+    return genre_names
+
 
 if __name__ == '__main__':
-    # src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
-    # films = data_cleaning(src_data)
-    # test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
+    global genres 
+    src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
+    films = data_cleaning(src_data)
+    test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
     
     secrets = get_secrets()
+
     genres = get_genres_from_api(secrets['api_key'])
     # Re-index genres 
     genres = dict((item['id'], item) for item in genres)
-    print(genres)
 
-    # Sample get from re-indexed genres dict
-    sample_genre = genres.get(28, {}).get('name')
-    print(sample_genre)
-
-    # master =  get_data_from_api(secrets['api_key'], test_id)
-    # print(get_info_from_film(films.iloc[0], master))
+    master =  get_data_from_api(secrets['api_key'], test_id)
+    print(get_info_from_film(films.iloc[0], master))
