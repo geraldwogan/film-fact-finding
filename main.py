@@ -1,5 +1,7 @@
 import pandas as pd
 import json
+import logging
+import os
 import re
 import requests
 import sys
@@ -14,7 +16,7 @@ def data_cleaning(all_media):
     # Create tidy df with just the relevant info
     tidy_films = films.loc[:,["Num", "Title", "Creator/Season", "Date Started", "Date Finished", "Days", "Month", "imdb_id"]]
 
-    print(tidy_films.head())
+    # print(tidy_films.head())
 
     return tidy_films
 
@@ -43,6 +45,7 @@ def get_genres_from_api(api_key):
     return content['genres']
 
 def get_data_from_api(api_key, imdb_id):
+
     # Headers -> User-Agent
     needed_headers = {'User-Agent': "film-fact-finding/1.0"}
 
@@ -98,15 +101,21 @@ def get_genre_from_ids(film): # TODO: Change to list comprehension?
 
 if __name__ == '__main__':
     global genres 
+
+    # Setup logging
+    logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+
+    log = logging.getLogger('film-logger')
+    log.info('Starting...')
     src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
     films = data_cleaning(src_data)
     test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
     
     secrets = get_secrets()
 
-    genres = get_genres_from_api(secrets['api_key'])
-    # Re-index genres 
-    genres = dict((item['id'], item) for item in genres)
+    # genres = get_genres_from_api(secrets['api_key'])
+    # # Re-index genres 
+    # genres = dict((item['id'], item) for item in genres)
 
-    master =  get_data_from_api(secrets['api_key'], test_id)
-    print(get_info_from_film(films.iloc[0], master))
+    # master =  get_data_from_api(secrets['api_key'], test_id)
+    # print(get_info_from_film(films.iloc[0], master))
