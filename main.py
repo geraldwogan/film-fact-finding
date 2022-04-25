@@ -18,6 +18,10 @@ def data_cleaning(all_media):
 
     # print(tidy_films.head())
 
+    log.info(f'Retrieving data for {len(tidy_films)} films.')
+    log.debug(f'Films found in media tracking doc: \n{tidy_films.Title}')
+
+
     return tidy_films
 
 def get_secrets():
@@ -103,7 +107,7 @@ if __name__ == '__main__':
     global genres 
 
     # Setup logging
-    logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
+    logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
 
     log = logging.getLogger('film-logger')
     log.info('Starting...')
