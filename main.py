@@ -22,7 +22,7 @@ def data_cleaning(all_media):
     log.debug(f'Films found in media tracking doc: \n{tidy_films.Title}')
 
 
-    return tidy_films
+    return pd.DataFrame(tidy_films)
 
 def get_secrets():
     # api token info
@@ -62,7 +62,7 @@ def get_data_from_api(api_key, imdb_id):
     # Get movie info from return content
     content = response.json()
     first_result = content['movie_results'][0]
-    print(first_result)
+    # print(first_result)
 
     return first_result
 
@@ -113,13 +113,18 @@ if __name__ == '__main__':
     log.info('Starting...')
     src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
     films = data_cleaning(src_data)
+    print(type(films))
     test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
     
     secrets = get_secrets()
 
-    # genres = get_genres_from_api(secrets['api_key'])
-    # # Re-index genres 
-    # genres = dict((item['id'], item) for item in genres)
+    genres = get_genres_from_api(secrets['api_key'])
+    # Re-index genres 
+    genres = dict((item.get('id'), item) for item in genres)
 
-    # master =  get_data_from_api(secrets['api_key'], test_id)
-    # print(get_info_from_film(films.iloc[0], master))
+    # for film in films:
+    for idx, film in films.iterrows():
+
+        print(type(film))
+        master = get_data_from_api(secrets['api_key'], film['imdb_id'])
+        print(get_info_from_film(film, master))
