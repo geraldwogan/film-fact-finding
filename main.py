@@ -108,23 +108,17 @@ if __name__ == '__main__':
 
     # Setup logging
     logging.basicConfig(level=os.environ.get("LOGLEVEL", "DEBUG"))
-
     log = logging.getLogger('film-logger')
     log.info('Starting...')
+
     src_data = pd.read_excel('data/2021 GW Media Tracking.xlsx', sheet_name='media_tracking', engine='openpyxl')
     films = data_cleaning(src_data)
-    print(type(films))
-    test_id = films.iloc[0]['imdb_id'] # tt10872600 - Spider-Man: No Way Home
-    
     secrets = get_secrets()
-
     genres = get_genres_from_api(secrets['api_key'])
     # Re-index genres 
     genres = dict((item.get('id'), item) for item in genres)
 
-    # for film in films:
     for idx, film in films.iterrows():
-
         print(type(film))
         master = get_data_from_api(secrets['api_key'], film['imdb_id'])
         print(get_info_from_film(film, master))
